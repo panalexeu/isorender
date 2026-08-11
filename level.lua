@@ -1,4 +1,5 @@
 -- isometric logic rendering is defined here 
+-- TODO look at code in more detail tomorrow, implement layer sorting, should be one time O(N) tiles sort with earlier layers being rendered first
 
 function level_load() 
     game_state = "level"
