@@ -8,10 +8,10 @@ function level_load()
         tiles = {},
     } 
     local tilemap = {
-        {1, 1, 1, 1}, 
+        {4, 1, 1, 1}, 
         {0, 1, 1, 0}, 
-        {0, 1, 1, 0}, 
-        {0, 1, 1, 0}
+        {0, 1, 2, 0}, 
+        {0, 3, 1, 0}
     }
     load_map(tilemap)
 end 
@@ -20,8 +20,7 @@ function level_draw()
     -- draw tiles 
     for i=1,#level_objects.tiles do
         local tile = level_objects.tiles[i]
-        love.graphics.setColor(tile.color[1], tile.color[2], tile.color[3], 1)
-        love.graphics.rectangle("line", tile.x, tile.y, tile.size_x, tile.size_y)
+        love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
     end 
 end 
 
@@ -31,11 +30,12 @@ end
 function load_map(tilemap)
     for i=1,#tilemap  do 
         for j=1,#tilemap[i] do 
-            if tilemap[i][j] == 1 then
+            local value = tilemap[i][j]
+            if value > 0 then
                 local x_pos = j * tile_size_x
                 local y_pos = i * tile_size_y
-                local color = {0.529, 0.808, 0.922} -- just a skyblue for now 
-                local tile_ = tile:new(x_pos, y_pos, tile_size_x, tile_size_y, color)
+                local quad = quads.tiles[value]
+                local tile_ = tile:new(x_pos, y_pos, tile_size_x, tile_size_y, quad)
                 table.insert(level_objects.tiles, tile_)
             end 
         end 

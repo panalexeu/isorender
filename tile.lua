@@ -1,9 +1,9 @@
 tile = class:new()
 
-function tile:init(x, y, size_x, size_y, color)
+function tile:init(x, y, w, h, quad)
     self.x = x
     self.y = y
-    self.size_x = size_x 
-    self.size_y = size_y
-    self.color = color
+    self.w = w
+    self.h = h
+    self.quad = quad
 end
