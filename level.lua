@@ -9,32 +9,45 @@ function level_load()
     tile_size_y = 16
     diamond_w = 8 
     diamond_h = 4
-    diamond_elavation = 8
+    layer_elavation = 8
     level_objects = {
         tiles = {},
     } 
     local layers = {
         {
-            {2, 2, 2, 2}, 
-            {2, 2, 2, 2}, 
-            {2, 2, 2, 2}, 
-            {2, 2, 2, 2}
+            {4, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {0, 0, 0, 0}
         },
         {
-            {0, 0, 0, 0, 3, 3, 3, 3}, 
-            {0, 0, 0, 0, 3, 0, 0, 3}, 
-            {0, 0, 0, 0, 3, 0, 0, 3}, 
-            {0, 0, 0, 0, 3, 0, 0, 3},
-            {3, 3, 3, 3, 3, 0, 0, 3}
+            {4, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {0, 0, 0, 0}
+        },
+        {
+            {4, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {0, 0, 0, 0}
+        },
+        {
+            {4, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {2, 2, 2, 0}, 
+            {0, 0, 0, 0}
         }
     }
     load_map(layers)
+    tiles_sort(level_objects.tiles)
 end 
 
 function level_draw()
     -- draw tiles 
     for i=1,#level_objects.tiles do
         local tile = level_objects.tiles[i]
+        print(tile.layer)
         love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
     end 
 end 
@@ -50,13 +63,30 @@ function load_map(layers)
                 local value = layer[i][j]
                 if value > 0 then
                     local x_proj = ((j - i) * diamond_w) + origin_x
-                    local y_proj = ((i + j) * diamond_h) + (k * diamond_elavation) + origin_y
-                    print(k * diamond_elavation)
+                    local y_proj = ((i + j) * diamond_h) + (k * layer_elavation) + origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(x_proj, y_proj, diamond_w, diamond_h, quad)
+                    local tile_ = tile:new(x_proj, y_proj, diamond_w, diamond_h, quad, k)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
         end 
     end
 end 
+
+function tiles_sort(tiles)
+    -- todo implement merge sort here 
+    -- for now just bubble sort o(n^2)
+    -- this function can also be omitted if traverse layers in reversed order 
+    for i=1,#tiles do
+        local max_j = i
+        for j=i,#tiles do
+            if tiles[j].layer > tiles[max_j].layer then
+                max_j = j
+            end
+        end 
+        -- swap 
+        local temp = tiles[max_j] 
+        tiles[max_j] = tiles[i]
+        tiles[i] = temp
+    end
+end
