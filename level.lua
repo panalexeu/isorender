@@ -3,41 +3,83 @@
 
 function level_load() 
     game_state = "level"
-    origin_x = 32
-    origin_y = 0
-    tile_size_x = 16
-    tile_size_y = 16
+    origin_x = 64
+    origin_y = 64
     diamond_w = 8 
     diamond_h = 4
     layer_elavation = 8
     level_objects = {
         tiles = {},
     } 
+    cur_tile = 1 
+    timer = 0
     local layers = {
         {
-            {4, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
+            {4, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
             {0, 0, 0, 0}
         },
         {
-            {4, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
+            {4, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
             {0, 0, 0, 0}
         },
         {
-            {4, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
+            {4, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
             {0, 0, 0, 0}
         },
         {
-            {4, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
-            {2, 2, 2, 0}, 
+            {3, 3, 0, 0}, 
+            {3, 0, 0, 0}, 
+            {0, 0, 0, 0}, 
             {0, 0, 0, 0}
-        }
+        },
+        {
+            {2, 2, 2, 0}, 
+            {2, 2, 0, 0}, 
+            {2, 0, 0, 0}, 
+            {0, 0, 0, 0}
+        },
+        {
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 0}, 
+            {1, 1, 0, 0}
+        },
+        {
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 0}, 
+            {1, 1, 0, 0}
+        },
+        {
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 0}, 
+            {1, 1, 0, 0}
+        },
+        {
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 0}, 
+            {1, 1, 0, 0}
+        },
+        {
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 0}, 
+            {1, 1, 0, 0}
+        },
+                {
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 1}, 
+            {1, 1, 1, 0}, 
+            {1, 1, 0, 0}
+        },
     }
     load_map(layers)
     tiles_sort(level_objects.tiles)
@@ -47,16 +89,25 @@ function level_draw()
     -- draw tiles 
     for i=1,#level_objects.tiles do
         local tile = level_objects.tiles[i]
-        print(tile.layer)
-        love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
+        if tile.visible then
+            love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
+        end
     end 
 end 
 
 function level_update(dt) 
+    -- render tiles one by one as they are sorted by the depth 
+    timer = timer + dt 
+    if timer > 0.1 then
+        level_objects.tiles[cur_tile].visible = true 
+        timer = 0 
+        cur_tile = cur_tile + 1
+        if cur_tile > #level_objects.tiles then cur_tile = #level_objects.tiles end 
+    end
 end
 
 function load_map(layers)
-    for k=1,#layers do
+    for k=#layers,1,-1 do
         local layer = layers[k]
         for i=1,#layer do 
             for j=1,#layer[i] do 
@@ -65,7 +116,7 @@ function load_map(layers)
                     local x_proj = ((j - i) * diamond_w) + origin_x
                     local y_proj = ((i + j) * diamond_h) + (k * layer_elavation) + origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(x_proj, y_proj, diamond_w, diamond_h, quad, k)
+                    local tile_ = tile:new(x_proj, y_proj, diamond_w, diamond_h, quad, false, k)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
@@ -76,11 +127,10 @@ end
 function tiles_sort(tiles)
     -- todo implement merge sort here 
     -- for now just bubble sort o(n^2)
-    -- this function can also be omitted if traverse layers in reversed order 
     for i=1,#tiles do
         local max_j = i
         for j=i,#tiles do
-            if tiles[j].layer > tiles[max_j].layer then
+            if tiles[j].y < tiles[max_j].y and tiles[j].layer == tiles[i].layer then
                 max_j = j
             end
         end 
