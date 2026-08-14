@@ -5,11 +5,12 @@ function love.load()
     require "tile"
     
     -- load graphics (quads and spreadsheets) 
+    tile_size = 16  
     quads = {
         tiles = {}
     } 
     local tiles_sheet = love.graphics.newImage("assets/tiles.png")
-    load_quads(tiles_sheet, 16, 16, "tiles")
+    load_quads(tiles_sheet, tile_size, tile_size, "tiles")
     
     level_load()
 end

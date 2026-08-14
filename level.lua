@@ -2,8 +2,11 @@
 
 function level_load() 
     game_state = "level"
-    origin_x = 64
-    origin_y = 64
+    screen_w = love.graphics.getWidth()
+    screen_h = love.graphics.getHeight()
+    tile_size = 16
+    origin_x = screen_w / 2 
+    origin_y = screen_h / 2
     diamond_w = 8 
     diamond_h = 4
     layer_elavation = 8
@@ -55,12 +58,30 @@ function level_load()
 end 
 
 function level_draw()
-    -- draw tiles 
+    draw_diamond_grid()
+    draw_tiles()
+end 
+
+function draw_tiles() 
+    love.graphics.setColor(1,1,1,1)
+
     for i=1,#level_objects.tiles do
         local tile = level_objects.tiles[i]
         if tile.visible then
             love.graphics.draw(tile.quad.img, tile.quad.quad, tile.proj_x, tile.proj_y)
         end
+    end 
+end 
+
+function draw_diamond_grid()
+    love.graphics.setColor(1,1,1, 0.33)
+
+    for i=0, screen_w-tile_size, tile_size do     
+        love.graphics.line(i, 0, i, screen_h)
+    end 
+
+    for j=0, screen_h-tile_size, tile_size do 
+        love.graphics.line(0, j, screen_w, j)
     end 
 end 
 
