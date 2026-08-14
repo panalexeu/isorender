@@ -96,6 +96,18 @@ function level_update(dt)
     end
 end
 
+function level_keypressed(key, scancode)
+end 
+
+function level_keyreleased(key, scancode)
+end
+
+function level_mousepressed(x ,y, button)
+end
+
+function level_mousereleased(x, y, button)
+end
+
 function load_map(layers)
     for k=#layers,1,-1 do
         local layer = layers[k]

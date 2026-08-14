@@ -27,6 +27,25 @@ function love.draw()
     end 
 end 
 
+function love.keypressed(key, scancode)
+    -- key is the character produced based on the current keyboard layout, so it can change if the layout changes
+    -- scancode is the physical position of the key on the keyboard, so it stays the same no matter the layout
+
+    print(key, scancode)
+
+    if scancode == 'escape' then love.event.quit() end 
+end  
+
+function love.keyreleased(key, scancode)
+end
+
+function love.mousepressed(x, y, button)
+    print(x, y, button)
+end 
+
+function love.mousereleased(x, y, button)
+end 
+
 function load_quads(sheet, w, h, key) 
     local sheet_w, sheet_h = sheet:getDimensions()
 
