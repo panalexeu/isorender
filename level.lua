@@ -48,37 +48,7 @@ function level_load()
             {1, 1, 1, 1}, 
             {1, 1, 1, 0}, 
             {1, 1, 0, 0}
-        },
-        {
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 0}, 
-            {1, 1, 0, 0}
-        },
-        {
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 0}, 
-            {1, 1, 0, 0}
-        },
-        {
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 0}, 
-            {1, 1, 0, 0}
-        },
-        {
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 0}, 
-            {1, 1, 0, 0}
-        },
-                {
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 0}, 
-            {1, 1, 0, 0}
-        },
+        }
     }
     load_map(layers)
     tiles_sort(level_objects.tiles)
@@ -139,3 +109,7 @@ function tiles_sort(tiles)
         tiles[i] = temp
     end
 end
+
+function filter_tiles(tiles)
+-- todo implement here function that removes tiles that are not visible from being rendred 
+end 
