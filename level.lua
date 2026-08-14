@@ -2,6 +2,7 @@
 
 function level_load() 
     game_state = "level"
+    level_state = "level"
     screen_w = love.graphics.getWidth()
     screen_h = love.graphics.getHeight()
     tile_size = 16
@@ -96,18 +97,6 @@ function level_update(dt)
     end
 end
 
-function level_keypressed(key, scancode)
-end 
-
-function level_keyreleased(key, scancode)
-end
-
-function level_mousepressed(x ,y, button)
-end
-
-function level_mousereleased(x, y, button)
-end
-
 function load_map(layers)
     for k=#layers,1,-1 do
         local layer = layers[k]
@@ -118,7 +107,7 @@ function load_map(layers)
                     local proj_x = ((j - i) * diamond_w) + origin_x
                     local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(j, i, proj_x, proj_y, diamond_w, diamond_h, quad, false, k)
+                    local tile_ = tile:new(j, i, proj_x, proj_y, tile_size, tile_size, quad, false, k)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
@@ -145,4 +134,33 @@ end
 
 function filter_tiles(tiles)
 -- todo implement here function that removes tiles that are not visible from being rendred 
+end 
+
+function tile_collision(x, y)
+    for tile in level_objects.tiles do 
+    end 
+end 
+
+function mouse_collision(mouse_x, mouse_y, tile)
+end 
+
+function level_keypressed(key, scancode)
+    if scancode == 'escape' and level_state == 'inventory' then
+        level_state = 'level'
+    elseif scancode == 'escape' and level_state == 'level' then 
+        love.event.quit()
+    end
+end 
+
+function level_keyreleased(key, scancode)
+end
+
+function level_mousepressed(x ,y, button)
+end
+
+function level_mousereleased(x, y, button)
+end
+
+function level_wheelmoved(x, y)
+    level_state = 'inventory'
 end 
