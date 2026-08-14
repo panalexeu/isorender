@@ -1,5 +1,4 @@
--- isometric logic rendering is defined here 
--- TODO look at code in more detail tomorrow, implement layer sorting, should be one time O(N) tiles sort with earlier layers being rendered first
+-- all of isometric logic rendering is defined here 
 
 function level_load() 
     game_state = "level"
@@ -90,7 +89,7 @@ function level_draw()
     for i=1,#level_objects.tiles do
         local tile = level_objects.tiles[i]
         if tile.visible then
-            love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
+            love.graphics.draw(tile.quad.img, tile.quad.quad, tile.proj_x, tile.proj_y)
         end
     end 
 end 
@@ -113,10 +112,10 @@ function load_map(layers)
             for j=1,#layer[i] do 
                 local value = layer[i][j]
                 if value > 0 then
-                    local x_proj = ((j - i) * diamond_w) + origin_x
-                    local y_proj = ((i + j) * diamond_h) + (k * layer_elavation) + origin_y
+                    local proj_x = ((j - i) * diamond_w) + origin_x
+                    local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(x_proj, y_proj, diamond_w, diamond_h, quad, false, k)
+                    local tile_ = tile:new(j, i, proj_x, proj_y, diamond_w, diamond_h, quad, false, k)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
@@ -125,8 +124,8 @@ function load_map(layers)
 end 
 
 function tiles_sort(tiles)
-    -- todo implement merge sort here 
-    -- for now just bubble sort o(n^2)
+    -- todo if possible replace bubble sort with something else here 
+    -- sorts tiles so that tiles from lower layers come first, and tiles within a layer are sorted by depth (lim->0(y) first)
     for i=1,#tiles do
         local max_j = i
         for j=i,#tiles do
