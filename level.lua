@@ -24,6 +24,9 @@ function level_load()
     }
     origin_x, origin_y = get_map_origin(layers)
     proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
+    grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
+
+    print(origin_x, origin_y)
 
     load_map(layers)
     tiles_sort(level_objects.tiles)
@@ -33,7 +36,7 @@ function level_draw()
     if level_state == "level" then 
         draw_projected_tiles()
     elseif level_state == "editor" then 
-        -- draw_diamond_grid()
+        draw_grid(grid_start_x, grid_start_y)
         draw_tiles()
     end 
 end 
@@ -60,14 +63,31 @@ function draw_tiles()
     end 
 end 
 
-function draw_grid()
+function get_origin_grid_offset(origin_x, origin_y)
+    --[[
+        get offsets to draw a grid around origin_x/y.
+        this is done by calculating an offset for start_x, start_y
+        such that the resulting range [start_x/y, origin_x/y] contains
+        an even number of tiles
+    ]]
+    local start_x = 0 
+    local mod_x = origin_x % tile_size 
+    if mod_x ~= 0 then start_x = start_x - (tile_size - mod_x) end 
+    local start_y = 0 
+    local mod_y = origin_y % tile_size 
+    if mod_y ~= 0 then start_y = start_y - (tile_size - mod_y) end 
+
+    return start_x, start_y
+end 
+
+function draw_grid(start_x, start_y)
     love.graphics.setColor(1,1,1, 0.33)
 
-    for i=0, screen_w-tile_size, tile_size do     
+    for i=start_x, screen_w-tile_size, tile_size do     
         love.graphics.line(i, 0, i, screen_h)
     end 
 
-    for j=0, screen_h-tile_size, tile_size do 
+    for j=start_y, screen_h-tile_size, tile_size do 
         love.graphics.line(0, j, screen_w, j)
     end 
 end 
@@ -180,5 +200,5 @@ function level_mousereleased(x, y, button)
 end
 
 function level_wheelmoved(x, y)
-    level_state = 'inventory'
+    level_state = 'level'
 end 
