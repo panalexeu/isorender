@@ -15,7 +15,9 @@ function level_load()
     cur_tile = 1 
     timer = 0
     origin_x, origin_y = 0, 0 
-    layers = create_layers(origin_x, origin_y, screen_w, screen_h, 1)
+    depth = 5 
+    cur_layer = depth 
+    layers = create_layers(origin_x, origin_y, screen_w, screen_h, 5)
     proj_origin_x, proj_origin_y = get_projected_map_origin()
     grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
 
@@ -45,6 +47,9 @@ function level_draw()
         draw_grid(grid_start_x, grid_start_y)
         draw_tiles()
     end 
+
+    -- debug prints 
+    love.graphics.print("cur_layer: " .. cur_layer, 0, screen_h-16)
 end 
 
 -- rendering/logic: 
@@ -65,7 +70,7 @@ function draw_tiles()
 
     for i=1,#level_objects.tiles do
         local tile = level_objects.tiles[i]
-        if tile.visible then
+        if tile.visible and tile.layer == cur_layer then
             love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
         end
     end 
@@ -199,6 +204,17 @@ function clear_tiles()
     level_objects.tiles = {} 
 end 
 
+function incr_layer(val)
+    local sum = cur_layer + val 
+    if sum > depth then 
+        cur_layer = 1 
+    elseif sum < 1 then 
+        cur_layer = depth
+    else 
+        cur_layer = sum
+    end 
+end 
+
 -- collisions: 
 
 function tile_collision(x, y)
@@ -212,11 +228,18 @@ end
 -- controls: 
 
 function level_keypressed(key, scancode)
+    -- switch mode 
     if scancode == 'escape' and level_state == 'level' then
         level_state = 'editor'
     elseif scancode == 'escape' and level_state == 'editor' then 
         level_state = 'level'
+    -- cur_layer update 
+    elseif scancode == 'w' then 
+        incr_layer(1)
+    elseif scancode == 's' then 
+        incr_layer(-1)
     end
+
 end 
 
 function level_keyreleased(key, scancode)
@@ -225,13 +248,13 @@ end
 function level_mousepressed(x ,y, button)
     if button == 1 and level_state == 'editor' then
         local i,j = snap_mouse_to_grid(x, y)
-        insert_tile(i, j, 1, 1)
+        insert_tile(i, j, 1, cur_layer)
         -- this will not work like that 
         clear_tiles()
         load_layers()
     elseif button == 2 and level_state == 'editor' then
         local i,j = snap_mouse_to_grid(x, y)
-        insert_tile(i, j, 0, 1)
+        insert_tile(i, j, 0, cur_layer)
         clear_tiles()
         load_layers()
     end 
@@ -249,4 +272,5 @@ end
 
 function level_wheelmoved(x, y)
     level_state = 'level'
+    print(x,y)
 end 
