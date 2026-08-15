@@ -52,12 +52,16 @@ function love.keyreleased(key, scancode)
 end
 
 function love.mousepressed(x, y, button)
-    print(x, y, button)
+    if game_state == 'level' then
+        level_mousepressed(x, y, button)
+    end
 end 
 
 function love.mousereleased(x, y, button)
 end 
 
 function love.wheelmoved(x, y)
-    level_wheelmoved(x, y)
+    if game_state == 'level' then 
+        level_wheelmoved(x, y)
+    end 
 end

@@ -14,28 +14,28 @@ function level_load()
     } 
     cur_tile = 1 
     timer = 0
-    local layers = {
-        {
-            {6,}
-        }
-    }
-    origin_x, origin_y = get_map_origin(layers)
-    proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
+    origin_x, origin_y = 0, 0 
+    layers = create_layers(origin_x, origin_y, screen_w, screen_h, 1)
+    proj_origin_x, proj_origin_y = get_projected_map_origin()
     grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
 
-    load_map(layers)
+    show_progress = false 
+
+    load_layers()
     tiles_sort(level_objects.tiles)
 end 
 
 function level_update(dt) 
     -- render tiles one by one as they are sorted by the depth 
-    timer = timer + dt 
-    if timer > 0.1 then
-        level_objects.tiles[cur_tile].visible = true 
-        timer = 0 
-        cur_tile = cur_tile + 1
-        if cur_tile > #level_objects.tiles then cur_tile = #level_objects.tiles end 
-    end
+    if show_progress then
+        timer = timer + dt 
+        if timer > 0.1 then
+            level_objects.tiles[cur_tile].visible = true 
+            timer = 0 
+            cur_tile = cur_tile + 1
+            if cur_tile > #level_objects.tiles then cur_tile = #level_objects.tiles end 
+        end
+    end 
 end
 
 function level_draw()
@@ -99,7 +99,7 @@ function draw_grid(start_x, start_y)
     end 
 end 
 
-function load_map(layers)
+function load_layers()
     for k=#layers,1,-1 do
         local layer = layers[k]
         for i=1,#layer do 
@@ -111,7 +111,7 @@ function load_map(layers)
                     local proj_x = ((j - i) * diamond_w) + proj_origin_x
                     local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + proj_origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(x, y, proj_x, proj_y, tile_size, tile_size, quad, false, k)
+                    local tile_ = tile:new(x, y, proj_x, proj_y, tile_size, tile_size, quad, true, k)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
@@ -119,7 +119,7 @@ function load_map(layers)
     end
 end 
 
-function get_map_origin(layers)
+function get_map_origin()
     local top_layer = layers[1]
     local layer_h = #top_layer * tile_size
     local layer_w = #max_len_table(top_layer) * tile_size 
@@ -130,7 +130,7 @@ function get_map_origin(layers)
     return origin_x, origin_y
 end 
 
-function get_projected_map_origin(layers)
+function get_projected_map_origin()
     --[[ get the map origin (centered) based on the top layer.
     the returned origin places the top corner of the top layer's
     projection at the screen center - i.e. the first element of
@@ -163,6 +163,8 @@ function create_layers(origin_x, origin_y, w, h, depth)
             end 
             table.insert(layers[k], row)
         end
+        -- add structure axis 
+        layers[k][1][1] = 6  
     end
 
     return layers 
@@ -189,6 +191,14 @@ function filter_tiles(tiles)
 -- todo implement here function that removes tiles that are not visible from being rendred 
 end 
 
+function insert_tile(i, j, value, depth)
+    layers[depth][i][j] = value
+end 
+
+function clear_tiles()
+    level_objects.tiles = {} 
+end 
+
 -- collisions: 
 
 function tile_collision(x, y)
@@ -213,7 +223,26 @@ function level_keyreleased(key, scancode)
 end
 
 function level_mousepressed(x ,y, button)
+    if button == 1 and level_state == 'editor' then
+        local i,j = snap_mouse_to_grid(x, y)
+        insert_tile(i, j, 1, 1)
+        -- this will not work like that 
+        clear_tiles()
+        load_layers()
+    elseif button == 2 and level_state == 'editor' then
+        local i,j = snap_mouse_to_grid(x, y)
+        insert_tile(i, j, 0, 1)
+        clear_tiles()
+        load_layers()
+    end 
 end
+
+function snap_mouse_to_grid(x, y)
+    -- + 1 to i/j here cause layer grid indexation starts from 1
+    local i = math.floor(y / tile_size) + 1   
+    local j = math.floor(x / tile_size) + 1 
+    return i, j
+end 
 
 function level_mousereleased(x, y, button)
 end
