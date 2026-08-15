@@ -22,15 +22,27 @@ function level_load()
             {1, 1, 1, 1}
         }, 
     }
-    origin_x, origin_y = get_map_origin(layers)
-    proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
-    grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
+    -- origin_x, origin_y = get_map_origin(layers)
+    -- proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
+    -- grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
+    origin_x, origin_y, proj_origin_x, proj_origin_y, grid_start_x, grid_start_y = 0, 0, 0, 0, 0, 0
 
     print(origin_x, origin_y)
 
     load_map(layers)
     tiles_sort(level_objects.tiles)
 end 
+
+function level_update(dt) 
+    -- render tiles one by one as they are sorted by the depth 
+    timer = timer + dt 
+    if timer > 0.1 then
+        level_objects.tiles[cur_tile].visible = true 
+        timer = 0 
+        cur_tile = cur_tile + 1
+        if cur_tile > #level_objects.tiles then cur_tile = #level_objects.tiles end 
+    end
+end
 
 function level_draw()
     if level_state == "level" then 
@@ -40,6 +52,8 @@ function level_draw()
         draw_tiles()
     end 
 end 
+
+-- rendering/logic: 
 
 function draw_projected_tiles() 
     love.graphics.setColor(1,1,1,1)
@@ -90,17 +104,6 @@ function draw_grid(start_x, start_y)
         love.graphics.line(0, j, screen_w, j)
     end 
 end 
-
-function level_update(dt) 
-    -- render tiles one by one as they are sorted by the depth 
-    timer = timer + dt 
-    if timer > 0.1 then
-        level_objects.tiles[cur_tile].visible = true 
-        timer = 0 
-        cur_tile = cur_tile + 1
-        if cur_tile > #level_objects.tiles then cur_tile = #level_objects.tiles end 
-    end
-end
 
 function load_map(layers)
     for k=#layers,1,-1 do
@@ -172,6 +175,8 @@ function filter_tiles(tiles)
 -- todo implement here function that removes tiles that are not visible from being rendred 
 end 
 
+-- collisions: 
+
 function tile_collision(x, y)
     for tile in level_objects.tiles do 
     end 
@@ -179,6 +184,8 @@ end
 
 function mouse_collision(mouse_x, mouse_y, tile)
 end 
+
+-- controls: 
 
 function level_keypressed(key, scancode)
     if scancode == 'escape' and level_state == 'level' then
