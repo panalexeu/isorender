@@ -145,6 +145,7 @@ function get_map_origin()
     return origin_x, origin_y
 end 
 
+-- TODO maybe create a version that centres based on the most top-left corner of the top layer 
 function get_projected_map_origin()
     --[[ get the map origin (centered) based on the top layer.
     the returned origin places the top corner of the top layer's
