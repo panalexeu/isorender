@@ -12,7 +12,9 @@ function level_load()
     level_objects = {
         tiles = {},
     } 
-    cur_tile = 1 
+    cur_tile = 1
+    cur_quad = 1 
+    quad_limit = 4
     timer = 0
     origin_x, origin_y = 0, 0 
     depth = 5 
@@ -49,7 +51,8 @@ function level_draw()
     end 
 
     -- debug prints 
-    love.graphics.print("cur_layer: " .. cur_layer, 0, screen_h-16)
+    love.graphics.print("cur_layer: " .. cur_layer, 0, screen_h-32)
+    love.graphics.print("cur_quad: " .. cur_quad, 0, screen_h-16)
 end 
 
 -- rendering/logic: 
@@ -222,6 +225,17 @@ function incr_layer(val)
     end 
 end 
 
+function incr_cur_quad(val) 
+    local sum = cur_quad + val
+    if sum > quad_limit then 
+        cur_quad = 1 
+    elseif sum < 1 then 
+        cur_quad = quad_limit
+    else 
+        cur_quad = sum
+    end 
+end 
+
 -- collisions: 
 
 function tile_collision(x, y)
@@ -255,7 +269,7 @@ end
 function level_mousepressed(x ,y, button)
     if button == 1 and level_state == 'editor' then
         local i,j = snap_mouse_to_grid(x, y)
-        insert_tile(i, j, 1, cur_layer)
+        insert_tile(i, j, cur_quad, cur_layer)
         -- this will not work like that 
         clear_tiles()
         load_layers()
@@ -278,6 +292,7 @@ function level_mousereleased(x, y, button)
 end
 
 function level_wheelmoved(x, y)
-    level_state = 'level'
-    print(x,y)
+    if level_state == 'editor' then 
+        incr_cur_quad(y)
+    end 
 end 
