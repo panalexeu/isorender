@@ -110,8 +110,8 @@ function load_map(layers)
             for j=1,#layer[i] do 
                 local value = layer[i][j]
                 if value > 0 then
-                    local x = j * tile_size + origin_x
-                    local y = i * tile_size + origin_y
+                    local x = (j - 1) * tile_size + origin_x
+                    local y = (i - 1) * tile_size + origin_y
                     local proj_x = ((j - i) * diamond_w) + proj_origin_x
                     local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + proj_origin_y
                     local quad = quads.tiles[value]
@@ -124,7 +124,6 @@ function load_map(layers)
 end 
 
 function get_map_origin(layers)
-    -- TODO sus here seems to give not a true centre 
     local top_layer = layers[1]
     local layer_h = #top_layer * tile_size
     local layer_w = #max_len_table(top_layer) * tile_size 
