@@ -16,18 +16,12 @@ function level_load()
     timer = 0
     local layers = {
         {
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}, 
-            {1, 1, 1, 1}
-        }, 
+            {6,}
+        }
     }
-    -- origin_x, origin_y = get_map_origin(layers)
-    -- proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
-    -- grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
-    origin_x, origin_y, proj_origin_x, proj_origin_y, grid_start_x, grid_start_y = 0, 0, 0, 0, 0, 0
-
-    print(origin_x, origin_y)
+    origin_x, origin_y = get_map_origin(layers)
+    proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
+    grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
 
     load_map(layers)
     tiles_sort(level_objects.tiles)
@@ -153,6 +147,26 @@ function get_projected_map_origin(layers)
     
     return origin_x, origin_y
 end  
+
+function create_layers(origin_x, origin_y, w, h, depth)
+    -- todo maybe remove this function later 
+    --[[ fills `depth` layers with empty tiles that cover [origin_x,w]
+    and [origin_y,h] range 
+    ]]
+    local layers = {}
+    for k=1,depth do
+        layers[k] = {}
+        for i=origin_y,h-tile_size,tile_size do
+            local row = {}
+            for j=origin_x,w-tile_size,tile_size do 
+                table.insert(row, 0)
+            end 
+            table.insert(layers[k], row)
+        end
+    end
+
+    return layers 
+end 
 
 function tiles_sort(tiles)
     -- todo if possible replace bubble sort with something else here 
