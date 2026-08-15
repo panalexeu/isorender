@@ -23,17 +23,22 @@ function level_load()
         }, 
     }
     origin_x, origin_y = get_map_origin(layers)
+    proj_origin_x, proj_origin_y = get_projected_map_origin(layers)
 
     load_map(layers)
     tiles_sort(level_objects.tiles)
 end 
 
 function level_draw()
-    draw_diamond_grid()
-    draw_tiles()
+    if level_state == "level" then 
+        draw_projected_tiles()
+    elseif level_state == "editor" then 
+        -- draw_diamond_grid()
+        draw_tiles()
+    end 
 end 
 
-function draw_tiles() 
+function draw_projected_tiles() 
     love.graphics.setColor(1,1,1,1)
 
     for i=1,#level_objects.tiles do
@@ -44,7 +49,18 @@ function draw_tiles()
     end 
 end 
 
-function draw_diamond_grid()
+function draw_tiles()
+    love.graphics.setColor(1,1,1,1)
+
+    for i=1,#level_objects.tiles do
+        local tile = level_objects.tiles[i]
+        if tile.visible then
+            love.graphics.draw(tile.quad.img, tile.quad.quad, tile.x, tile.y)
+        end
+    end 
+end 
+
+function draw_grid()
     love.graphics.setColor(1,1,1, 0.33)
 
     for i=0, screen_w-tile_size, tile_size do     
@@ -74,10 +90,12 @@ function load_map(layers)
             for j=1,#layer[i] do 
                 local value = layer[i][j]
                 if value > 0 then
-                    local proj_x = ((j - i) * diamond_w) + origin_x
-                    local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + origin_y
+                    local x = j * tile_size + origin_x
+                    local y = i * tile_size + origin_y
+                    local proj_x = ((j - i) * diamond_w) + proj_origin_x
+                    local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + proj_origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(j, i, proj_x, proj_y, tile_size, tile_size, quad, false, k)
+                    local tile_ = tile:new(x, y, proj_x, proj_y, tile_size, tile_size, quad, false, k)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
@@ -86,6 +104,18 @@ function load_map(layers)
 end 
 
 function get_map_origin(layers)
+    -- TODO sus here seems to give not a true centre 
+    local top_layer = layers[1]
+    local layer_h = #top_layer * tile_size
+    local layer_w = #max_len_table(top_layer) * tile_size 
+
+    local origin_y = (love.graphics.getHeight() / 2) - (layer_h / 2)
+    local origin_x = (love.graphics.getWidth() / 2) - (layer_w  / 2)
+
+    return origin_x, origin_y
+end 
+
+function get_projected_map_origin(layers)
     --[[ get the map origin (centered) based on the top layer.
     the returned origin places the top corner of the top layer's
     projection at the screen center - i.e. the first element of
@@ -133,10 +163,10 @@ function mouse_collision(mouse_x, mouse_y, tile)
 end 
 
 function level_keypressed(key, scancode)
-    if scancode == 'escape' and level_state == 'inventory' then
+    if scancode == 'escape' and level_state == 'level' then
+        level_state = 'editor'
+    elseif scancode == 'escape' and level_state == 'editor' then 
         level_state = 'level'
-    elseif scancode == 'escape' and level_state == 'level' then 
-        love.event.quit()
     end
 end 
 
