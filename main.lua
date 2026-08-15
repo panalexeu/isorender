@@ -3,7 +3,8 @@ function love.load()
     require "level"
     require "quad"
     require "tile"
-    
+    require "utils"
+
     -- load graphics (quads and spreadsheets) 
     tile_size = 16  
     quads = {

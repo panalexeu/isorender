@@ -6,8 +6,6 @@ function level_load()
     screen_w = love.graphics.getWidth()
     screen_h = love.graphics.getHeight()
     tile_size = 16
-    origin_x = screen_w / 2 
-    origin_y = screen_h / 2
     diamond_w = 8 
     diamond_h = 4
     layer_elavation = 8
@@ -18,10 +16,10 @@ function level_load()
     timer = 0
     local layers = {
         {
-            {4, 0, 0, 0}, 
-            {0, 0, 0, 0}, 
-            {0, 0, 0, 0}, 
-            {0, 0, 0, 0}
+            {5, 4, 4, 4}, 
+            {3, 0, 0, 0}, 
+            {3, 0, 0, 0}, 
+            {3, 0, 0, 0}
         },
         {
             {4, 0, 0, 0}, 
@@ -54,6 +52,8 @@ function level_load()
             {1, 1, 0, 0}
         }, 
     }
+    origin_x, origin_y = get_map_origin(layers)
+
     load_map(layers)
     tiles_sort(level_objects.tiles)
 end 
@@ -115,6 +115,24 @@ function load_map(layers)
     end
 end 
 
+function get_map_origin(layers)
+    --[[ get the map origin (centered) based on the top layer.
+    the returned origin places the top corner of the top layer's
+    projection at the screen center - i.e. the first element of
+    the first row in the layer. ]]
+
+    local top_layer = layers[1]
+    -- isometric projection height in pixels
+    local layer_h = #top_layer * diamond_h + (tile_size - diamond_h) 
+    -- isometric projection width in pixels 
+    local layer_w = #max_len_table(top_layer) * diamond_w + (tile_size - diamond_w)
+    
+    local origin_y = (love.graphics.getHeight() / 2) - (layer_h / 2)
+    local origin_x = (love.graphics.getWidth() / 2) - (layer_w / 2)
+    
+    return origin_x, origin_y
+end  
+
 function tiles_sort(tiles)
     -- todo if possible replace bubble sort with something else here 
     -- sorts tiles so that tiles from lower layers come first, and tiles within a layer are sorted by depth (lim->0(y) first)
@@ -135,7 +153,6 @@ end
 function filter_tiles(tiles)
 -- todo implement here function that removes tiles that are not visible from being rendred 
 end 
-
 
 function tile_collision(x, y)
     for tile in level_objects.tiles do 
