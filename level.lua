@@ -64,12 +64,11 @@ function draw_tiles()
 end 
 
 function get_origin_grid_offset(origin_x, origin_y)
-    --[[
-        get offsets to draw a grid around origin_x/y.
-        this is done by calculating an offset for start_x, start_y
-        such that the resulting range [start_x/y, origin_x/y] contains
-        an even number of tiles
-    ]]
+    --[[ get offsets to draw a grid around origin_x/y.
+    this is done by calculating an offset for start_x, start_y
+    such that the resulting range [start_x/y, origin_x/y] contains
+    an even number of tiles ]]
+
     local start_x = 0 
     local mod_x = origin_x % tile_size 
     if mod_x ~= 0 then start_x = start_x - (tile_size - mod_x) end 
