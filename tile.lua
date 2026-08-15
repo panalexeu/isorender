@@ -1,6 +1,6 @@
 tile = class:new()
 
-function tile:init(x, y,  proj_x, proj_y, w, h, quad, visible, layer)
+function tile:init(x, y,  proj_x, proj_y, w, h, quad, visible, layer, highlight)
     --[[
         `x` and `y` - position inside of layer `layer`; 
         `proj_x` and `proj_y` - isometric projection positions of a tile (as it is displayed on a screen);  
@@ -14,4 +14,5 @@ function tile:init(x, y,  proj_x, proj_y, w, h, quad, visible, layer)
     self.quad = quad
     self.visible = visible
     self.layer = layer
+    self.highlight = highlight
 end

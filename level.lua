@@ -62,6 +62,13 @@ function draw_projected_tiles()
         if tile.visible then
             love.graphics.draw(tile.quad.img, tile.quad.quad, tile.proj_x, tile.proj_y)
         end
+
+        if tile.layer ~= cur_layer then 
+            tile.highlight = false 
+        else
+            local highlight_quad = quads.tiles[6]
+            love.graphics.draw(highlight_quad.img, highlight_quad.quad, tile.proj_x, tile.proj_y)
+        end 
     end 
 end 
 
@@ -116,7 +123,7 @@ function load_layers()
                     local proj_x = ((j - i) * diamond_w) + proj_origin_x
                     local proj_y = ((i + j) * diamond_h) + (k * layer_elavation) + proj_origin_y
                     local quad = quads.tiles[value]
-                    local tile_ = tile:new(x, y, proj_x, proj_y, tile_size, tile_size, quad, true, k)
+                    local tile_ = tile:new(x, y, proj_x, proj_y, tile_size, tile_size, quad, true, k, false)
                     table.insert(level_objects.tiles, tile_)
                 end 
             end 
@@ -169,7 +176,7 @@ function create_layers(origin_x, origin_y, w, h, depth)
             table.insert(layers[k], row)
         end
         -- add structure axis 
-        layers[k][1][1] = 6  
+        layers[k][1][1] = 1
     end
 
     return layers 
@@ -235,9 +242,9 @@ function level_keypressed(key, scancode)
         level_state = 'level'
     -- cur_layer update 
     elseif scancode == 'w' then 
-        incr_layer(1)
-    elseif scancode == 's' then 
         incr_layer(-1)
+    elseif scancode == 's' then 
+        incr_layer(1)
     end
 
 end 
