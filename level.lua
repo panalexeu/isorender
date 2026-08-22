@@ -92,7 +92,7 @@ end
 function draw_grid(start_x, start_y)
     love.graphics.setColor(1,1,1, 0.33)
 
-    for i=start_x, screen_w-tile_size, tile_size /logic: do     
+    for i=start_x, screen_w-tile_size, tile_size do     
         love.graphics.line(i, 0, i, screen_h)
     end 
 
