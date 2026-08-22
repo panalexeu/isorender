@@ -4,6 +4,7 @@ function love.load()
     require "quad"
     require "tile"
     require "utils"
+    require "action"
 
     -- load graphics (quads and spreadsheets) 
     tile_size = 16  
@@ -52,9 +53,6 @@ function love.keyreleased(key, scancode)
 end
 
 function love.mousepressed(x, y, button)
-    if game_state == 'level' then
-        level_mousepressed(x, y, button)
-    end
 end 
 
 function love.mousereleased(x, y, button)

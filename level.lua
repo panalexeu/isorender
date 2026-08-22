@@ -2,7 +2,7 @@
 
 function level_load() 
     game_state = "level"
-    level_state = "level"
+    level_state = "level" -- "level", "editor"
     screen_w = love.graphics.getWidth()
     screen_h = love.graphics.getHeight()
     tile_size = 16
@@ -12,6 +12,8 @@ function level_load()
     level_objects = {
         tiles = {},
     } 
+    actions = {
+    }
     cur_tile = 1
     cur_quad = 1 
     quad_limit = 4
@@ -23,24 +25,11 @@ function level_load()
     proj_origin_x, proj_origin_y = get_simple_projected_map_origin()
     grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
 
-    show_progress = false 
-
     load_layers()
     tiles_sort(level_objects.tiles)
 end 
 
-function level_update(dt) 
-    -- render tiles one by one as they are sorted by the depth 
-    if show_progress then
-        timer = timer + dt 
-        if timer > 0.1 then
-            level_objects.tiles[cur_tile].visible = true 
-            timer = 0 
-            cur_tile = cur_tile + 1
-            if cur_tile > #level_objects.tiles then cur_tile = #level_objects.tiles end 
-        end
-    end 
-end
+-- rendering
 
 function level_draw()
     if level_state == "level" then 
@@ -54,8 +43,6 @@ function level_draw()
     love.graphics.print("cur_layer: " .. cur_layer, 0, screen_h-32)
     love.graphics.print("cur_quad: " .. cur_quad, 0, screen_h-16)
 end 
-
--- rendering/logic: 
 
 function draw_projected_tiles() 
     love.graphics.setColor(1,1,1,1)
@@ -105,7 +92,7 @@ end
 function draw_grid(start_x, start_y)
     love.graphics.setColor(1,1,1, 0.33)
 
-    for i=start_x, screen_w-tile_size, tile_size do     
+    for i=start_x, screen_w-tile_size, tile_size /logic: do     
         love.graphics.line(i, 0, i, screen_h)
     end 
 
@@ -214,36 +201,6 @@ function filter_tiles(tiles)
 -- todo implement here function that removes tiles that are not visible from being rendred 
 end 
 
-function insert_tile(i, j, value, depth)
-    layers[depth][i][j] = value
-end 
-
-function clear_tiles()
-    level_objects.tiles = {} 
-end 
-
-function incr_layer(val)
-    local sum = cur_layer + val 
-    if sum > depth then 
-        cur_layer = 1 
-    elseif sum < 1 then 
-        cur_layer = depth
-    else 
-        cur_layer = sum
-    end 
-end 
-
-function incr_cur_quad(val) 
-    local sum = cur_quad + val
-    if sum > quad_limit then 
-        cur_quad = 1 
-    elseif sum < 1 then 
-        cur_quad = quad_limit
-    else 
-        cur_quad = sum
-    end 
-end 
-
 -- collisions: 
 
 function tile_collision(x, y)
@@ -275,26 +232,7 @@ function level_keyreleased(key, scancode)
 end
 
 function level_mousepressed(x ,y, button)
-    if button == 1 and level_state == 'editor' then
-        local i,j = snap_mouse_to_grid(x, y)
-        insert_tile(i, j, cur_quad, cur_layer)
-        -- this will not work like that 
-        clear_tiles()
-        load_layers()
-    elseif button == 2 and level_state == 'editor' then
-        local i,j = snap_mouse_to_grid(x, y)
-        insert_tile(i, j, 0, cur_layer)
-        clear_tiles()
-        load_layers()
-    end 
 end
-
-function snap_mouse_to_grid(x, y)
-    -- + 1 to i/j here cause layer grid indexation starts from 1
-    local i = math.floor(y / tile_size) + 1   
-    local j = math.floor(x / tile_size) + 1 
-    return i, j
-end 
 
 function level_mousereleased(x, y, button)
 end
@@ -304,3 +242,72 @@ function level_wheelmoved(x, y)
         incr_cur_quad(y)
     end 
 end 
+
+function snap_mouse_to_grid(x, y)
+    -- + 1 to i/j here cause layer grid indexation starts from 1
+    -- returns x and y
+    local i = math.floor(y / tile_size) + 1   
+    local j = math.floor(x / tile_size) + 1 
+    return j, i
+end 
+
+function incr_layer(val)
+    local sum = cur_layer + val 
+    if sum > depth then 
+        cur_layer = 1 
+    elseif sum < 1 then 
+        cur_layer = depth
+    else 
+        cur_layer = sum
+    end 
+end 
+
+function incr_cur_quad(val) 
+    local sum = cur_quad + val
+    if sum > quad_limit then 
+        cur_quad = 1 
+    elseif sum < 1 then 
+        cur_quad = quad_limit
+    else 
+        cur_quad = sum
+    end 
+end 
+
+-- update logic 
+
+function level_update(dt) 
+    -- handle mousepress/release action queue  
+    if level_state == "editor" then
+        if love.mouse.isDown(1)then 
+            local x, y = snap_mouse_to_grid(love.mouse.getPosition())
+            local act = action:new(x,y,cur_quad,cur_layer) 
+            actions[act:key()] = act   
+        elseif love.mouse.isDown(2) then
+            local x, y = snap_mouse_to_grid(love.mouse.getPosition())
+            local act = action:new(x,y,0,cur_layer) 
+            actions[act:key()] = act   
+        -- empty action queue        
+        else 
+            if not is_empty(actions) then 
+                empty_actions()
+            end
+        end 
+    end
+end
+
+function insert_tile(i, j, value, depth)
+    layers[depth][i][j] = value
+end 
+
+function clear_tiles()
+    level_objects.tiles = {} 
+end 
+
+function empty_actions()
+    for _, act in pairs(actions) do 
+        insert_tile(act.y, act.x, act.value, act.layer)
+        actions[act:key()] = nil 
+    end
+    clear_tiles()
+    load_layers()
+end  

@@ -5,3 +5,7 @@ function max_len_table(t)
     end 
     return best 
 end 
+
+function is_empty(t)
+    return next(t) == nil 
+end 
