@@ -173,8 +173,8 @@ end
 
 function create_layers(origin_x, origin_y, w, h, depth)
     -- todo maybe remove this function later 
-    --[[ fills `depth` layers with empty tiles that cover [origin_x,w]
-    and [origin_y,h] range 
+    --[[ fills `depth` layers with empty tiles that cover [origin_x,w,tile_size]
+    and [origin_y,h,tile_size] range 
     ]]
     local layers = {}
     for k=1,depth do
