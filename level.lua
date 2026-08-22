@@ -22,7 +22,7 @@ function level_load()
     depth = 5 
     cur_layer = depth 
     layers = create_layers(origin_x, origin_y, screen_w, screen_h, 5)
-    proj_origin_x, proj_origin_y = get_simple_projected_map_origin()
+    proj_origin_x, proj_origin_y = get_projected_map_origin(screen_w)
     grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
 
     load_layers()
@@ -121,38 +121,8 @@ function load_layers()
     end
 end 
 
-function get_map_origin()
-    local top_layer = layers[1]
-    local layer_h = #top_layer * tile_size
-    local layer_w = #max_len_table(top_layer) * tile_size 
-
-    local origin_y = (love.graphics.getHeight() / 2) - (layer_h / 2)
-    local origin_x = (love.graphics.getWidth() / 2) - (layer_w  / 2)
-
-    return origin_x, origin_y
-end 
-
--- TODO maybe create a version that centres based on the most top-left corner of the top layer 
-function get_projected_map_origin()
-    --[[ get the map origin (centered) based on the top layer.
-    the returned origin places the top corner of the top layer's
-    projection at the screen center - i.e. the first element of
-    the first row in the layer. ]]
-
-    local top_layer = layers[1]
-    -- isometric projection height in pixels
-    local layer_h = #top_layer * diamond_h + (tile_size - diamond_h) 
-    -- isometric projection width in pixels 
-    local layer_w = #max_len_table(top_layer) * diamond_w + (tile_size - diamond_w)
-    
-    local origin_y = (love.graphics.getHeight() / 2) - (layer_h / 2)
-    local origin_x = (love.graphics.getWidth() / 2) - (layer_w / 2)
-    
-    return origin_x, origin_y
-end  
-
-function get_simple_projected_map_origin()
-    local origin_x = (love.graphics.getWidth() / 2) - diamond_w / 2 
+function get_projected_map_origin(w)
+    local origin_x = (w / 2) - diamond_w / 2 
     local origin_y = 0 
 
     return  origin_x, origin_y 
