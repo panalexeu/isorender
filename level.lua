@@ -20,7 +20,7 @@ function level_load()
     depth = 5 
     cur_layer = depth 
     layers = create_layers(origin_x, origin_y, screen_w, screen_h, 5)
-    proj_origin_x, proj_origin_y = get_projected_map_origin()
+    proj_origin_x, proj_origin_y = get_simple_projected_map_origin()
     grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
 
     show_progress = false 
@@ -163,6 +163,13 @@ function get_projected_map_origin()
     
     return origin_x, origin_y
 end  
+
+function get_simple_projected_map_origin()
+    local origin_x = (love.graphics.getWidth() / 2) - diamond_w / 2 
+    local origin_y = 0 
+
+    return  origin_x, origin_y 
+end 
 
 function create_layers(origin_x, origin_y, w, h, depth)
     -- todo maybe remove this function later 
