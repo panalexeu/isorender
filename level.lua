@@ -18,9 +18,9 @@ function level_load()
     cur_quad = 1 
     quad_limit = 4
     timer = 0
-    origin_x, origin_y = 0, 0 
     depth = 5 
     cur_layer = depth 
+    origin_x, origin_y = 0, 0 
     layers = create_layers(origin_x, origin_y, screen_w, screen_h, 5)
     proj_origin_x, proj_origin_y = get_projected_map_origin(screen_w)
     grid_start_x, grid_start_y = get_origin_grid_offset(origin_x, origin_y)
